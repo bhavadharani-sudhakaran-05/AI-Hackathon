@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - InfluencerPulse</title>
+  <link rel="stylesheet" href="login.css">
+</head>
+<body>
+  <div class="login-container">
+    <h2>Welcome Back</h2>
+    <form id="loginForm">
+      <input type="text" placeholder="Username" id="username" required />
+      <input type="password" placeholder="Password" id="password" required />
+      <button type="submit">Login</button>
+      <p class="message">Don't have an account? <a href="signup.html">Sign Up</a></p>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById("loginForm").addEventListener("submit", function(event){
+      event.preventDefault();
+      alert("Login successful!");
+      // Automatically go to dashboard page after login
+      window.location.href = "newww.html"; 
+    });
+  </script>
+</body>
+</html>

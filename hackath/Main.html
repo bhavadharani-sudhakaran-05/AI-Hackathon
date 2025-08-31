@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>InfluencerPulse - All in One</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* ===== Landing Page ===== */
+    .gradient-bg { background: linear-gradient(135deg, #4f46e5, #ec4899, #06b6d4); background-size: 300% 300%; animation: gradientShift 8s ease infinite; }
+    @keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+    .text-primary { color: #4f46e5; }
+    .bg-accent { background-color: #ec4899; }
+
+    /* ===== Card/Dashboard ===== */
+    .card-hover { transition: all 0.3s ease; }
+    .card-hover:hover { transform: translateY(-5px); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+    .stat-card { background: white; padding: 24px; border-radius: 16px; text-align:center; display:flex; flex-direction:column; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(0,0,0,0.05); }
+    .icon-wrapper { width:60px; height:60px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:28px; margin-bottom:12px; }
+    .stat-number { font-size:28px; font-weight:bold; margin-bottom:6px; }
+    .stat-label { font-size:14px; color:#555; }
+    .progress { background:#e5e7eb; border-radius:8px; height:6px; width:100%; margin-top:10px; overflow:hidden; }
+    .progress-fill { background:#10b981; height:100%; width:0; transition:width 1s ease-in-out; }
+
+    /* ===== Recent Activity ===== */
+    .recent-activity { background: #fff; border-radius: 1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.08); padding: 1.5rem; margin-bottom: 3rem; max-height: 520px; overflow-y:auto; }
+    .recent-activity h3 { font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem; }
+    .filter-buttons { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+    .filter-buttons button { padding: 0.4rem 0.9rem; border-radius: 20px; border: none; cursor: pointer; font-size: 0.9rem; background: #f3f4f6; transition: all 0.3s ease; }
+    .filter-buttons button.active { background: #4f46e5; color: #fff; }
+    .search-box { margin-bottom: 1rem; }
+    .search-box input { width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #ddd; border-radius: 0.5rem; font-size: 0.9rem; }
+    .activity-card { display:flex; align-items:center; justify-content:space-between; padding:1rem; border-radius:0.75rem; margin-bottom:1rem; opacity:0; transform:translateY(10px); animation:fadeInUp 0.5s forwards; }
+    @keyframes fadeInUp { to { opacity:1; transform:translateY(0); } }
+    .activity-card:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+    .activity-avatar { width:48px; height:48px; border-radius:50%; object-fit:cover; margin-right:1rem; }
+    .activity-info .name { font-weight:600; }
+    .activity-info .meta { font-size:0.85rem; color:#555; }
+    .badge { padding:0.3rem 0.8rem; border-radius:9999px; font-size:0.8rem; font-weight:500; white-space:nowrap; }
+    .badge-positive { background: #dcfce7; color:#166534; }
+    .badge-alert { background: #fee2e2; color:#991b1b; }
+    .badge-opportunity { background: #dbeafe; color:#1e3a8a; }
+    .bg-positive { background:#f0fdf4; }
+    .bg-alert { background:#fef2f2; }
+    .bg-opportunity { background:#eff6ff; }
+
+    /* ===== Modals ===== */
+    .modal { position: fixed; inset:0; background: rgba(0,0,0,0.6); display:flex; justify-content:center; align-items:center; opacity:0; pointer-events:none; transition: all 0.3s ease; }
+    .modal.show { opacity:1; pointer-events:auto; }
+    .modal-content { background:white; border-radius:12px; padding:30px; width:100%; max-width:400px; text-align:center; position:relative; transform:scale(0.8); transition: all 0.3s ease-in-out; }
+    .modal.show .modal-content { transform:scale(1); }
+    .modal-content input { width:100%; padding:12px; margin:10px 0; border:1px solid #ccc; border-radius:8px; font-size:16px; }
+    .modal-content input:focus { outline:none; border-color:#667eea; box-shadow:0 0 8px rgba(102,126,234,0.5); }
+    .modal-content button { width:100%; padding:12px; margin-top:10px; border:none; border-radius:8px; font-size:16px; cursor:pointer; color:white; background:#667eea; transition:0.2s; }
+    .modal-content button:hover { background:#556cd6; transform:scale(1.03); }
+    .close-btn { position:absolute; top:10px; right:10px; cursor:pointer; font-size:18px; color:#555; }
+    .modal-content p { margin-top:10px; font-size:14px; }
+    .modal-content p a { color:#667eea; text-decoration:none; }
+
+    /* ===== Influencer Tracker ===== */
+    .tracker input, .tracker select, .tracker button { padding:10px; margin:5px; border-radius:8px; border:1px solid #ccc; }
+    .tracker button { background:#3b82f6; color:white; cursor:pointer; font-weight:bold; border:none; }
+    .card-grid { display:flex; gap:20px; justify-content:center; flex-wrap:wrap; }
+    .card { background:white; border-radius:12px; padding:20px; width:300px; box-shadow:0 2px 6px rgba(0,0,0,0.1); position:relative; }
+    .card h3 { margin:0 0 5px; }
+    .card p { margin:5px 0; color:#555; }
+    .btn { display:block; width:100%; margin-top:15px; padding:10px; background:#3b82f6; color:white; text-align:center; border-radius:8px; cursor:pointer; border:none; font-weight:bold; }
+    .analysis-box { background:#f9fafb; margin-top:15px; padding:10px; border-radius:8px; font-size:14px; display:block; }
+    /* ===== Influencer Tracker Section Background ===== */
+#influencerTracker {
+  position: relative;
+  background: linear-gradient(135deg, #f0f4f8, #e0e7ff);
+  overflow: hidden;
+  padding: 6rem 1.5rem;
+  border-radius: 1rem;
+  z-index: 1;
+}
+
+/* Floating gradient blobs behind cards */
+#influencerTracker::after {
+  content: "";
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle at 30% 30%, rgba(99,102,241,0.25), transparent 70%);
+  border-radius: 50%;
+  top: -100px;
+  right: -100px;
+  animation: floatBlob 12s ease-in-out infinite alternate;
+  pointer-events: none;
+  z-index: 0;
+}
+
+#influencerTracker::before {
+  content: "";
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle at 70% 70%, rgba(236,72,153,0.25), transparent 70%);
+  border-radius: 50%;
+  bottom: -80px;
+  left: -80px;
+  animation: floatBlob 15s ease-in-out infinite alternate-reverse;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes floatBlob {
+  0% { transform: translateY(0) translateX(0) rotate(0deg); }
+  50% { transform: translateY(20px) translateX(15px) rotate(45deg); }
+  100% { transform: translateY(0) translateX(0) rotate(0deg); }
+}
+
+/* Ensure cards appear above the blobs */
+.card-grid .card {
+  position: relative;
+  z-index: 1;
+}
+
+/* ===== Influencer Tracker Section Background ===== */
+#influencers {
+  position: relative;
+  background: linear-gradient(135deg, #f0f4f8, #e0e7ff);
+  overflow: hidden;
+  padding: 6rem 1.5rem;
+  border-radius: 1rem;
+  z-index: 1;
+}
+
+/* Floating gradient blobs behind cards */
+#influencers::after {
+  content: "";
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle at 30% 30%, rgba(99,102,241,0.25), transparent 70%);
+  border-radius: 50%;
+  top: -100px;
+  right: -100px;
+  animation: floatBlob 12s ease-in-out infinite alternate;
+  pointer-events: none;
+  z-index: 0;
+}
+
+#influencers::before {
+  content: "";
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle at 70% 70%, rgba(236,72,153,0.25), transparent 70%);
+  border-radius: 50%;
+  bottom: -80px;
+  left: -80px;
+  animation: floatBlob 15s ease-in-out infinite alternate-reverse;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes floatBlob {
+  0% { transform: translateY(0) translateX(0) rotate(0deg); }
+  50% { transform: translateY(20px) translateX(15px) rotate(45deg); }
+  100% { transform: translateY(0) translateX(0) rotate(0deg); }
+}
+
+/* Ensure cards appear above the blobs */
+#influencers .grid > div {
+  position: relative;
+  z-index: 1;
+}
+.ai-tool-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+  }
+  .ai-tool-card:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 25px 40px rgba(0, 0, 0, 0.25);
+    background: #f3f4f6; /* slight background change on hover */
+  }
+
+  /* AI Tool Icon */
+  .ai-tool-card .icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    transition: transform 0.3s ease, color 0.3s ease;
+  }
+  .ai-tool-card:hover .icon {
+    transform: rotate(15deg) scale(1.1);
+    color: #7c3aed; /* violet accent on hover */
+  }
+
+  /* Card text */
+  .ai-tool-card h3 {
+    transition: color 0.3s ease;
+  }
+  .ai-tool-card:hover h3 {
+    color: #4f46e5; /* Indigo accent */
+  }
+
+  /* Responsive tweaks */
+  @media (max-width: 768px) {
+    .ai-tool-card {
+      margin: 0 auto;
+    }
+  }
+</style>
+
+</head>
+<body class="text-gray-900">
+
+  <!-- ===== Landing Page ===== -->
+  <header class="gradient-bg text-white"> 
+    <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+      <div class="flex items-center space-x-2">
+        <i class="fas fa-chart-line text-2xl"></i>
+        <h1 class="text-2xl font-bold">InfluencerPulse</h1>
+      </div>
+      <div class="hidden md:flex space-x-6">
+        <a href="#dashboard" class="hover:text-blue-200 transition">Dashboard</a>
+        <a href="#recentActivity" class="hover:text-blue-200 transition">Recent Activity</a>
+        <a href="#influencerTracker" class="hover:text-blue-200 transition">Influencer Tracker</a>
+      </div>
+      <button id="getStartedBtn" class="bg-white text-primary px-6 py-2 rounded-full font-semibold hover:bg-blue-50 transition">Get Started</button>
+    </nav>
+    <div class="container mx-auto px-6 py-20 text-center">
+      <h2 class="text-4xl md:text-6xl font-bold mb-6">Track. Analyze. Outperform.</h2>
+      <p class="text-xl md:text-2xl mb-8 opacity-90">AI-powered influencer monitoring for brand teams</p>
+      <div class="flex flex-col md:flex-row justify-center space-y-4 md:space-y-0 md:space-x-4">
+        <button id="freeTrialBtn" class="bg-accent text-white px-8 py-3 rounded-full font-semibold hover:bg-pink-600 transition">Start Free Trial</button>
+        <button id="demoBtn" class="bg-transparent border-2 border-white text-white px-8 py-3 rounded-full font-semibold hover:bg-white hover:text-primary transition">Watch Demo</button>
+      </div>
+    </div> 
+  </header>
+
+  <!-- ===== Login Modal ===== -->
+  <div id="loginModal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeModal('loginModal')">✖</span>
+      <h2 class="text-2xl font-bold mb-4">Login</h2>
+      <input type="text" placeholder="Username" id="loginUsername" required>
+      <input type="password" placeholder="Password" id="loginPassword" required>
+      <button onclick="submitLogin()">Get Started</button>
+      <p>Don't have an account? <a href="#" onclick="openModal('signupModal')">Sign Up</a></p>
+    </div>
+  </div>
+
+  <!-- ===== Signup Modal ===== -->
+  <div id="signupModal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeModal('signupModal')">✖</span>
+      <h2 class="text-2xl font-bold mb-4">Sign Up</h2>
+      <input type="text" placeholder="Username" id="signupUsername" required>
+      <input type="email" placeholder="Email" id="signupEmail" required>
+      <input type="password" placeholder="Password" id="signupPassword" required>
+      <input type="password" placeholder="Confirm Password" id="signupConfirmPassword" required>
+      <button onclick="submitSignup()">Start Free Trial</button>
+      <p>Already have an account? <a href="#" onclick="openModal('loginModal')">Login here</a></p>
+    </div>
+  </div>
+
+  <!-- ===== Dashboard Stats ===== -->
+  <section id="dashboard" class="py-20 bg-white">
+    <div class="container mx-auto px-6">
+      <h2 class="text-3xl font-bold text-center mb-12">Real-Time Influencer Intelligence</h2>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+        <div class="stat-card card-hover">
+          <div class="icon-wrapper bg-blue-100 text-blue-600"><i class="fas fa-users"></i></div>
+          <h3 class="stat-number counter" data-target="247">0</h3>
+          <p class="stat-label">Active Influencers</p>
+        </div>
+        <div class="stat-card card-hover">
+          <div class="icon-wrapper bg-purple-100 text-purple-600"><i class="fas fa-chart-bar"></i></div>
+          <h3 class="stat-number counter" data-target="1248">0</h3>
+          <p class="stat-label">Posts Analyzed</p>
+        </div>
+        <div class="stat-card card-hover">
+          <div class="icon-wrapper bg-pink-100 text-pink-600"><i class="fas fa-bell"></i></div>
+          <h3 class="stat-number counter" data-target="42">0</h3>
+          <p class="stat-label">New Alerts</p>
+        </div>
+        <div class="stat-card card-hover">
+          <div class="icon-wrapper bg-green-100 text-green-600"><i class="fas fa-trending-up"></i></div>
+          <h3 class="stat-number">89%</h3>
+          <p class="stat-label">Positive Sentiment</p>
+          <div class="progress"><div id="sentimentBar" class="progress-fill"></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Recent Activity ===== -->
+  <section id="recentActivity" class="py-12 bg-gray-50 flex justify-center">
+    <div class="recent-activity w-full max-w-3xl">
+      <h3>Recent Activity</h3>
+      <div class="search-box">
+        <input type="text" id="searchInput" placeholder="🔍 Search activity or member..." onkeyup="searchActivities()">
+      </div>
+      <div class="filter-buttons">
+        <button onclick="filterActivities('all')" class="active">All</button>
+        <button onclick="filterActivities('Positive')">Positive</button>
+        <button onclick="filterActivities('Alert')">Alert</button>
+        <button onclick="filterActivities('Opportunity')">Opportunity</button>
+      </div>
+      <div id="activity-list"></div>
+    </div>
+  </section>
+
+
+
+  <!-- ===== Scripts ===== -->
+  <script>
+    // ===== Modal Functions =====
+    function openModal(modalId){document.getElementById(modalId).classList.add('show');}
+    function closeModal(modalId){document.getElementById(modalId).classList.remove('show');}
+    document.getElementById('getStartedBtn').addEventListener('click',()=>openModal('loginModal'));
+    document.getElementById('freeTrialBtn').addEventListener('click',()=>openModal('signupModal'));
+    function submitLogin(){closeModal('loginModal'); alert('Logged in! Redirecting to dashboard...'); document.getElementById('dashboard').scrollIntoView({behavior:'smooth'});}
+    function submitSignup(){closeModal('signupModal'); alert('Signup successful! Redirecting to dashboard...'); document.getElementById('dashboard').scrollIntoView({behavior:'smooth'});}
+
+    // ===== Demo Modal =====
+    const demoBtn=document.getElementById('demoBtn');
+    const demoModal=document.createElement('div');
+    demoModal.innerHTML=`
+      <div id="demoModal" class="modal">
+        <div class="modal-content">
+          <span class="close-btn" onclick="closeDemoModal()">✖</span>
+          <h3 class="text-xl font-bold mb-4 text-primary">Watch Demo</h3>
+          <div class="aspect-w-16 aspect-h-9">
+            <iframe class="w-full h-96 rounded-lg" src="https://www.youtube.com/embed/Ya70cM3alDM" title="Demo Video" frameborder="0" allowfullscreen></iframe>
+          </div>
+        </div>
+      </div>`;
+    document.body.appendChild(demoModal);
+    function closeDemoModal(){demoModal.querySelector('.modal').classList.remove('show');}
+    demoBtn.addEventListener('click',()=>demoModal.querySelector('.modal').classList.add('show'));
+
+    // ===== Dashboard Counter & Progress =====
+    const counters=document.querySelectorAll(".counter");
+    counters.forEach(counter=>{
+      const updateCount=()=>{
+        const target=+counter.getAttribute("data-target");
+        const count=+counter.innerText;
+        const inc=Math.ceil(target/200);
+        if(count<target){counter.innerText=count+inc; setTimeout(updateCount,20);}
+        else{counter.innerText=target;}
+      };updateCount();
+    });
+    const sentimentBar=document.getElementById("sentimentBar");
+    sentimentBar.style.width="89%";
+
+    // ===== Recent Activity =====
+    const activities=[
+      {name:'John Doe',platform:'Instagram',content:'Posted about AI trends',status:'Positive'},
+      {name:'Jane Smith',platform:'YouTube',content:'Discussed brand campaigns',status:'Opportunity'},
+      {name:'Alex Kim',platform:'LinkedIn',content:'Shared marketing insights',status:'Alert'},
+      {name:'Sarah Lee',platform:'Instagram',content:'Promoted wellness products',status:'Positive'},
+      {name:'Mike Brown',platform:'TikTok',content:'Viral video on productivity',status:'Opportunity'}
+    ];
+    const activityList=document.getElementById('activity-list');
+    function renderActivities(filter='all'){
+      activityList.innerHTML='';
+      activities.forEach(a=>{
+        if(filter!=='all' && a.status!==filter) return;
+        const card=document.createElement('div');
+        card.className='activity-card '+(a.status==='Positive'?'bg-positive':a.status==='Alert'?'bg-alert':'bg-opportunity');
+        card.innerHTML=`<div class="activity-info"><div class="name">${a.name}</div><div class="meta">${a.platform}: ${a.content}</div></div><span class="badge ${a.status==='Positive'?'badge-positive':a.status==='Alert'?'badge-alert':'badge-opportunity'}">${a.status}</span>`;
+        activityList.appendChild(card);
+      });
+    }
+    renderActivities();
+    function filterActivities(status){document.querySelectorAll('.filter-buttons button').forEach(b=>b.classList.remove('active'));event.target.classList.add('active');renderActivities(status);}
+    function searchActivities(){const val=document.getElementById('searchInput').value.toLowerCase();renderActivities(); Array.from(activityList.children).forEach(c=>{if(!c.innerText.toLowerCase().includes(val)) c.style.display='none'; else c.style.display='flex';});}
+
+    
+   
+  </script>
+
+</body>
+<body class="bg-gray-100">
+<div class="container mx-auto p-6">
+  <h1 class="text-3xl font-bold mb-6 text-center">🤖 AI Influencer Tracker</h1>
+
+  <!-- Tracker Form -->
+  <div class="bg-white p-6 rounded-xl shadow-lg max-w-md mx-auto mb-8">
+    <label class="block mb-2 font-medium">Platform</label>
+    <select id="platform" class="w-full px-4 py-2 border rounded-lg mb-4">
+      <option>Instagram</option>
+      <option>YouTube</option>
+      <option>LinkedIn</option>
+      <option>TikTok</option>
+      <option>Twitter/X</option>
+    </select>
+
+    <label class="block mb-2 font-medium">Username</label>
+    <input type="text" id="username" placeholder="@username" class="w-full px-4 py-2 border rounded-lg mb-4"/>
+
+    <button id="track-btn" class="w-full bg-blue-500 text-white py-2 rounded-lg">Track Me</button>
+  </div>
+
+  <div id="stats" class="mb-8 max-w-md mx-auto"></div>
+
+  <!-- Influencers Section -->
+  <section id="influencers" class="py-12 bg-gray-100">
+    <div class="container mx-auto px-6">
+      <h2 class="text-3xl font-bold text-center mb-8">Tracked Influencers & Competitors</h2>
+
+      <div id="influencer-cards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- Default Card 1 -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden p-6 relative">
+          <span class="absolute top-0 right-0 bg-pink-500 text-white p-2 rounded-full text-sm">
+            <i class="fab fa-instagram"></i>
+          </span>
+          <h3 class="font-bold text-lg mb-2">Emma Rodriguez</h3>
+          <p class="text-gray-600 mb-2">Instagram</p>
+          <div class="grid grid-cols-3 gap-4 mb-2 text-center">
+            <div><p class="font-bold">👥 1.2M</p><p class="text-sm text-gray-600">Followers</p></div>
+            <div><p class="font-bold">💬 4.8%</p><p class="text-sm text-gray-600">Engagement</p></div>
+            <div><p class="font-bold">😊 92%</p><p class="text-sm text-gray-600">Positive</p></div>
+          </div>
+          <button class="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition" onclick="analyzeInfluencer('Emma Rodriguez')">View Analysis</button>
+          <div class="analysis mt-2 text-sm"></div>
+        </div>
+
+        <!-- Default Card 2 -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden p-6 relative">
+          <span class="absolute top-0 right-0 bg-red-600 text-white p-2 rounded-full text-sm">
+            <i class="fab fa-youtube"></i>
+          </span>
+          <h3 class="font-bold text-lg mb-2">Alex Turner</h3>
+          <p class="text-gray-600 mb-2">YouTube</p>
+          <div class="grid grid-cols-3 gap-4 mb-2 text-center">
+            <div><p class="font-bold">👥 890K</p><p class="text-sm text-gray-600">Subscribers</p></div>
+            <div><p class="font-bold">💬 6.2%</p><p class="text-sm text-gray-600">Engagement</p></div>
+            <div><p class="font-bold">😊 78%</p><p class="text-sm text-gray-600">Positive</p></div>
+          </div>
+          <button class="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition" onclick="analyzeInfluencer('Alex Turner')">View Analysis</button>
+          <div class="analysis mt-2 text-sm"></div>
+        </div>
+
+        <!-- Default Card 3 -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden p-6 relative">
+          <span class="absolute top-0 right-0 bg-pink-500 text-white p-2 rounded-full text-sm">
+            <i class="fab fa-instagram"></i>
+          </span>
+          <h3 class="font-bold text-lg mb-2">Bhava_05_</h3>
+          <p class="text-gray-600 mb-2">Instagram</p>
+          <div class="grid grid-cols-3 gap-4 mb-2 text-center">
+            <div><p class="font-bold">👥 521051</p><p class="text-sm text-gray-600">Followers</p></div>
+            <div><p class="font-bold">💬 5.7%</p><p class="text-sm text-gray-600">Engagement</p></div>
+            <div><p class="font-bold">😊 2%</p><p class="text-sm text-gray-600">Positive</p></div>
+          </div>
+          <button class="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition" onclick="analyzeInfluencer('Bhava_05_')">View Analysis</button>
+          <div class="analysis mt-2 text-sm"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Advanced Analytics -->
+  <section id="analytics" class="py-12 hidden">
+    <div class="container mx-auto px-6">
+      <h2 class="text-3xl font-bold text-center mb-10">
+        Advanced Analytics & Insights <span id="analytics-for" class="text-gray-500 text-xl block mt-2"></span>
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Sentiment -->
+        <div class="bg-white rounded-2xl shadow-lg p-6">
+          <h3 class="text-2xl font-semibold mb-6">Sentiment Analysis</h3>
+          <div class="grid grid-cols-3 gap-4">
+            <div class="bg-green-50 rounded-xl p-5 text-center">
+              <div class="text-4xl mb-2">😊</div>
+              <div id="sa-pos" class="text-2xl font-bold">65%</div>
+              <div class="text-green-700 font-medium">Positive</div>
+            </div>
+            <div class="bg-gray-100 rounded-xl p-5 text-center">
+              <div class="text-4xl mb-2">😐</div>
+              <div id="sa-neu" class="text-2xl font-bold">25%</div>
+              <div class="text-gray-700 font-medium">Neutral</div>
+            </div>
+            <div class="bg-red-50 rounded-xl p-5 text-center">
+              <div class="text-4xl mb-2">😞</div>
+              <div id="sa-neg" class="text-2xl font-bold">10%</div>
+              <div class="text-red-700 font-medium">Negative</div>
+            </div>
+          </div>
+
+          <div class="mt-8">
+            <div class="flex justify-between mb-2 text-sm font-medium">
+              <span>Positive Sentiment Trend</span>
+              <span id="sa-trend" class="text-green-600">+12%</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-3">
+              <div id="sa-bar" class="bg-green-500 h-3 rounded-full" style="width: 65%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Engagement -->
+        <div class="bg-white rounded-2xl shadow-lg p-6">
+          <h3 class="text-2xl font-semibold mb-6">Engagement Metrics</h3>
+
+          <div class="mb-6">
+            <div class="flex justify-between text-sm font-medium mb-2">
+              <span>Average Engagement Rate</span><span id="em-rate" class="text-blue-600">5.2%</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-3">
+              <div id="em-rate-bar" class="bg-blue-600 h-3 rounded-full" style="width: 52%"></div>
+            </div>
+          </div>
+
+          <div class="mb-6">
+            <div class="flex justify-between text-sm font-medium mb-2">
+              <span>Content Reach</span><span id="em-reach" class="text-purple-600">2.1M</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-3">
+              <div id="em-reach-bar" class="bg-purple-600 h-3 rounded-full" style="width: 70%"></div>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex justify-between text-sm font-medium mb-2">
+              <span>Video Completion</span><span id="em-vid" class="text-pink-600">78%</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-3">
+              <div id="em-vid-bar" class="bg-pink-500 h-3 rounded-full" style="width: 78%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+const platformIcons = {
+  "Instagram": { icon: "fab fa-instagram", bg: "bg-pink-500" },
+  "YouTube": { icon: "fab fa-youtube", bg: "bg-red-600" },
+  "LinkedIn": { icon: "fab fa-linkedin", bg: "bg-blue-700" },
+  "TikTok": { icon: "fab fa-tiktok", bg: "bg-black" },
+  "Twitter/X": { icon: "fab fa-twitter", bg: "bg-blue-400" }
+};
+
+// Add new influencer (keeps your UI)
+document.getElementById('track-btn').addEventListener('click', () => {
+  const username = document.getElementById('username').value.trim();
+  const platform = document.getElementById('platform').value;
+  if (!username) return alert("⚠️ Please enter a username.");
+
+  const influencerCards = document.getElementById('influencer-cards');
+  const stats = {
+    followers: Math.floor(Math.random() * 1_000_000),
+    engagement: (Math.random() * 10).toFixed(1) + '%',
+    sentiment: Math.floor(Math.random() * 100) + '% Positive'
+  };
+  const pf = platformIcons[platform] || { icon: "", bg: "bg-gray-500" };
+
+  const card = document.createElement('div');
+  card.className = 'bg-white rounded-xl shadow-lg overflow-hidden p-6 relative';
+  card.innerHTML = `
+    <span class="absolute top-0 right-0 ${pf.bg} text-white p-2 rounded-full text-sm"><i class="${pf.icon}"></i></span>
+    <h3 class="font-bold text-lg mb-2">${username}</h3>
+    <p class="text-gray-600 mb-2">${platform}</p>
+    <div class="grid grid-cols-3 gap-4 mb-2 text-center">
+      <div><p class="font-bold">👥 ${stats.followers}</p><p class="text-sm text-gray-600">Followers</p></div>
+      <div><p class="font-bold">💬 ${stats.engagement}</p><p class="text-sm text-gray-600">Engagement</p></div>
+      <div><p class="font-bold">😊 ${stats.sentiment}</p><p class="text-sm text-gray-600">Positive</p></div>
+    </div>
+    <button class="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition" onclick="analyzeInfluencer('${username}')">View Analysis</button>
+    <div class="analysis mt-2 text-sm"></div>
+  `;
+  influencerCards.appendChild(card);
+  analyzeInfluencer(username); // auto show analytics for new card
+  document.getElementById('username').value = '';
+});
+
+// --------- LIVE DUMMY ANALYTICS (no backend) ----------
+function seededRand(seed) {
+  // deterministic-ish per name
+  let x = 0;
+  for (let i = 0; i < seed.length; i++) x = (x * 31 + seed.charCodeAt(i)) % 997;
+  return () => (x = (x * 1103515245 + 12345) % 2**31) / 2**31;
+}
+
+function getDummyAnalytics(name) {
+  const r = seededRand(name);
+  const pos = Math.floor(50 + r() * 45);           // 50–95
+  const neu = Math.floor(5 + r() * 30);            // 5–35
+  let neg = 100 - pos - neu;                       // remainder
+  if (neg < 0) neg = Math.max(2, 10 + Math.floor(r()*10));
+  const trend = (Math.round((r() * 20 - 5) * 10) / 10); // -5% to +15%
+
+  const engagementRate = (3 + r() * 7).toFixed(1); // 3.0–10.0
+  const reach = Math.floor(500_000 + r() * 2_500_000); // 0.5–3.0M
+  const videoCompletion = Math.floor(55 + r() * 40);   // 55–95
+
+  return {
+    sentiment: { positive: pos, neutral: neu, negative: neg, trend },
+    engagement: {
+      rate: engagementRate,                 // %
+      reach,                                // absolute
+      videoCompletion                       // %
+    }
+  };
+}
+
+function analyzeInfluencer(name) {
+  // mini analysis inside the card
+  const card = [...document.querySelectorAll('#influencer-cards > div')]
+    .find(c => c.querySelector('h3').textContent === name);
+  if (!card) return;
+  const a = getDummyAnalytics(name);
+  const analysisDiv = card.querySelector('.analysis');
+  analysisDiv.innerHTML = `
+    <div class="bg-gray-50 rounded-lg p-3">
+      <p><b>Sentiment:</b> ${a.sentiment.positive}% Positive, ${a.sentiment.neutral}% Neutral, ${a.sentiment.negative}% Negative</p>
+      <p><b>Engagement Rate:</b> ${a.engagement.rate}%</p>
+      <p><b>Content Reach:</b> ${formatNumber(a.engagement.reach)}</p>
+      <p><b>Video Completion:</b> ${a.engagement.videoCompletion}%</p>
+      <p><b>Recommendation:</b> ${
+        a.sentiment.positive >= 70 && a.engagement.rate >= 6
+          ? 'Strong fit for upcoming campaign.'
+          : 'Monitor performance; test with a small collaboration.'
+      }</p>
+    </div>
+  `;
+
+  // big "Advanced Analytics" section
+  document.getElementById('analytics').classList.remove('hidden');
+  document.getElementById('analytics-for').textContent = `for ${name}`;
+
+  // Sentiment widgets
+  document.getElementById('sa-pos').textContent = `${a.sentiment.positive}%`;
+  document.getElementById('sa-neu').textContent = `${a.sentiment.neutral}%`;
+  document.getElementById('sa-neg').textContent = `${a.sentiment.negative}%`;
+  document.getElementById('sa-trend').textContent =
+    `${a.sentiment.trend > 0 ? '+' : ''}${a.sentiment.trend}%`;
+  document.getElementById('sa-trend').className =
+    `text-sm ${a.sentiment.trend >= 0 ? 'text-green-600' : 'text-red-600'}`;
+  document.getElementById('sa-bar').style.width = `${a.sentiment.positive}%`;
+
+  // Engagement widgets
+  document.getElementById('em-rate').textContent = `${a.engagement.rate}%`;
+  document.getElementById('em-rate-bar').style.width = `${a.engagement.rate * 10}%`; // 0–100%
+
+  document.getElementById('em-reach').textContent = formatNumber(a.engagement.reach);
+  document.getElementById('em-reach-bar').style.width =
+    `${Math.min(100, (a.engagement.reach / 3_000_000) * 100)}%`;
+
+  document.getElementById('em-vid').textContent = `${a.engagement.videoCompletion}%`;
+  document.getElementById('em-vid-bar').style.width = `${a.engagement.videoCompletion}%`;
+}
+
+function formatNumber(n) {
+  if (n >= 1_000_000) return (n/1_000_000).toFixed(1) + 'M';
+  if (n >= 1_000) return (n/1_000).toFixed(1) + 'K';
+  return String(n);
+}
+</script>
+<body class="bg-gray-100">
+<!-- AI Tools Section -->
+<section class="py-12 bg-gradient-to-r from-purple-500 to-indigo-500 text-white mt-12">
+  <div class="container mx-auto px-6 text-center">
+    <h2 class="text-3xl font-bold mb-8">AI Tools for Influencer Analysis</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+      <a href="https://openai.com/research/" target="_blank" class="ai-tool-card block bg-white text-gray-800 rounded-xl shadow-lg p-6">
+        <div class="icon">🧠</div>
+        <h3 class="text-xl font-bold mb-2">Topic Detection</h3>
+        <p>AI identifies key themes and trending topics across all content.</p>
+      </a>
+
+      <a href="https://www.tensorflow.org/" target="_blank" class="ai-tool-card block bg-white text-gray-800 rounded-xl shadow-lg p-6">
+        <div class="icon">📈</div>
+        <h3 class="text-xl font-bold mb-2">Trend Prediction</h3>
+        <p>Predicts emerging trends 48 hours before they peak.</p>
+      </a>
+
+      <a href="https://www.databricks.com/" target="_blank" class="ai-tool-card block bg-white text-gray-800 rounded-xl shadow-lg p-6">
+        <div class="icon">🤖</div>
+        <h3 class="text-xl font-bold mb-2">Automated Insights</h3>
+        <p>Generates comprehensive reports every 48 hours.</p>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<script>
+  // Optional JS if you want to open AI tools dynamically
+  function openAI(tool, username) {
+    let url = "#";
+    if(tool==="chatgpt") url = `https://chat.openai.com/?message=Analyze+social+media+trends+of+${encodeURIComponent(username)}`;
+    else if(tool==="dalle") url = `https://openai.com/dall-e?text=Create+content+images+for+${encodeURIComponent(username)}`;
+    else if(tool==="bard") url = `https://bard.google.com/?q=Analyze+${encodeURIComponent(username)}+social+media`;
+    window.open(url, "_blank");
+  }
+</script>
+
+</body>
+
+</body>
+
+</html>  
